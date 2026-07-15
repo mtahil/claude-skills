@@ -24,24 +24,26 @@ Then proceed with the correct values below.
 ### Agents Of Item
 - JQL group: `F-ITEM-Mgmt-Agents Of Item`
 - ToBeReleased fix version ID: `69805`
-- NonDeployable fix version ID: `63906`
+- NonDeployable fix version ID: `69806`
 
 ---
 
 ## Step 1 — Find PM Review items
 
-Run JQL:
-```
-project = EISART AND status = "PM Review" AND sprint in openSprints() AND assignee in membersOf("<team group name>")
-```
+Use the `searchJiraIssuesUsingJql` tool with:
+- `jql`: `project = EISART AND status = "PM Review" AND sprint in openSprints() AND assignee in membersOf("<team group name>")`
+- `fields`: `["summary", "description", "issuetype", "status", "fixVersions", "customfield_10032", "comment", "attachment"]`
+- `searchResultMode`: `"issues"` ← **required by the updated Jira API; always include this**
 
-Fields to fetch: `summary`, `description`, `issuetype`, `status`, `fixVersions`, `customfield_10032` (Story Points), `comment`, `attachment`
+> `searchResultMode` controls what the search returns: `"issues"` = issue data, `"count"` = count only, `"all"` = both. We always use `"issues"`.
 
 Present the full list to the user with: #, Issue Key, Type, Summary, Fix Version, Story Points.
 
 ---
 
 ## Step 2 — For each item, present a review summary
+
+> **IMPORTANT — Sequential, one at a time**: Process tickets ONE AT A TIME. Fully analyze one ticket, present all findings, then ask "Close it or send back?" — wait for the user's decision and act on it before moving to the next ticket. Do NOT fetch all tickets' details upfront or present bulk analyses.
 
 For each item, retrieve full issue details and analyze:
 
@@ -112,3 +114,4 @@ At the end, present a final summary table.
 - Unmerged but approved PRs: present facts to user and let them decide
 - The `products-domain-workflow-service` repo contains the main Go workflow service
 - The `mx-eix-workflow-engine` repo contains Inventory Kupid / Temporal workflow code (Java)
+- The `products-domain-ehs-feeder` repo is the Avro-based event pipeline for hierarchy/group events (PD EHS Feeder)
