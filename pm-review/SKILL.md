@@ -32,7 +32,7 @@ Then proceed with the correct values below.
 
 Use the `searchJiraIssuesUsingJql` tool with:
 - `jql`: `project = EISART AND status = "PM Review" AND sprint in openSprints() AND assignee in membersOf("<team group name>")`
-- `fields`: `["summary", "description", "issuetype", "status", "fixVersions", "customfield_10032", "comment", "attachment"]`
+- `fields`: `["summary", "description", "issuetype", "status", "fixVersions", "customfield_10032", "comment", "attachment", "parent"]`
 - `searchResultMode`: `"issues"` ← **required by the updated Jira API; always include this**
 
 > `searchResultMode` controls what the search returns: `"issues"` = issue data, `"count"` = count only, `"all"` = both. We always use `"issues"`.
