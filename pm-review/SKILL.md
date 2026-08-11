@@ -17,12 +17,12 @@ Ask the user: **"Which team? Product Rangers or Agents Of Item?"**
 Then proceed with the correct values below.
 
 ### Product Rangers
-- JQL group: `F-ITEM-Mgmt-Product Rangers`
+- JQL Team name: `F-ITEM-Mgmt-Product Rangers`
 - ToBeReleased fix version ID: `70628`
 - NonDeployable fix version ID: `71012`
 
 ### Agents Of Item
-- JQL group: `F-ITEM-Mgmt-Agents Of Item`
+- JQL Team name: `F-ITEM-Mgmt-Agents Of Item`
 - ToBeReleased fix version ID: `69805`
 - NonDeployable fix version ID: `69806`
 
@@ -31,9 +31,13 @@ Then proceed with the correct values below.
 ## Step 1 — Find PM Review items
 
 Use the `searchJiraIssuesUsingJql` tool with:
-- `jql`: `project = EISART AND status = "PM Review" AND sprint in openSprints() AND assignee in membersOf("<team group name>")`
+- `jql`: `project = EISART AND status = "PM Review" AND sprint in openSprints() AND "Team[Team]" = "<team name>"`
+  - Product Rangers: `"Team[Team]" = "F-ITEM-Mgmt-Product Rangers"`
+  - Agents Of Item: `"Team[Team]" = "F-ITEM-Mgmt-Agents Of Item"`
 - `fields`: `["summary", "description", "issuetype", "status", "fixVersions", "customfield_10032", "comment", "attachment", "parent"]`
 - `searchResultMode`: `"issues"` ← **required by the updated Jira API; always include this**
+
+> **Why Team[Team] and not assignee group?** The `assignee in membersOf()` filter misses contributors who aren't in the Jira group but are working on the team's sprint. The `"Team[Team]"` field (customfield_10001) is set directly on each ticket and is the authoritative signal for team ownership.
 
 > `searchResultMode` controls what the search returns: `"issues"` = issue data, `"count"` = count only, `"all"` = both. We always use `"issues"`.
 
