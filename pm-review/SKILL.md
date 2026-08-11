@@ -45,6 +45,13 @@ Present the full list to the user with: #, Issue Key, Type, Summary, Fix Version
 
 > **IMPORTANT — Sequential, one at a time**: Process tickets ONE AT A TIME. Fully analyze one ticket, present all findings, then ask "Close it or send back?" — wait for the user's decision and act on it before moving to the next ticket. Do NOT fetch all tickets' details upfront or present bulk analyses.
 
+### Pre-check: Parent field gate
+
+Before doing any analysis, check if the `parent` field is populated on the issue.
+
+- If **Parent is missing** on a Story, Task, or Spike: **automatically send it back** (transition ID `81`) with the comment: `"This ticket is missing a Parent (Epic link). Please link it to the appropriate Epic before it can be reviewed."` — do NOT do any further analysis, and move on to the next ticket.
+- If Parent is present: proceed with the full review below.
+
 For each item, retrieve full issue details and analyze:
 
 1. **Acceptance Criteria** — Extract from description. Are they clearly defined?
