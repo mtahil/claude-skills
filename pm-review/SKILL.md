@@ -30,18 +30,34 @@ Then proceed with the correct values below.
 
 ## Step 1 — Find PM Review items
 
+### Primary search (fix version filter)
+
 Use the `searchJiraIssuesUsingJql` tool with:
 - `jql`: `project = EISART AND status = "PM Review" AND sprint in openSprints() AND fixVersion in (<ToBeReleased ID>, <NonDeployable ID>)`
   - Product Rangers: `fixVersion in (70628, 71012)`
   - Agents Of Item: `fixVersion in (69805, 69806)`
-- `fields`: `["summary", "description", "issuetype", "status", "fixVersions", "customfield_10032", "comment", "attachment", "parent"]`
+- `fields`: `["summary", "description", "issuetype", "status", "fixVersions", "customfield_10032", "customfield_10001", "comment", "attachment", "parent"]`
 - `searchResultMode`: `"issues"` ← **required by the updated Jira API; always include this**
 
-> **Why fix version and not assignee group or Team field?** `assignee in membersOf()` misses contributors not in the Jira group. The `"Team[Team]"` custom field (customfield_10001) is not JQL-filterable in this Jira instance. Fix version IDs are the most reliable signal — Product Rangers and Agents Of Item items are explicitly tagged with their team's fix versions.
+### Secondary search (catch sprint-specific fix versions)
+
+Some tickets are tagged with sprint-specific fix versions (e.g., `AgentsOfItem-26Q2-6.0`, `AgentsOfItem-26Q2-7.0` for prod deployment CRs) that are **not** in the standard ToBeReleased/NonDeployable set. These will be missed by the primary search.
+
+**Always run a second broad search** immediately after:
+- `jql`: `project = EISART AND status = "PM Review" AND sprint in openSprints()`
+- Same `fields` as above, same `searchResultMode: "issues"`
+
+From the broad results, filter client-side: keep only tickets where `customfield_10001` (Team field) matches the team name:
+- **Product Rangers**: `"F-ITEM-Mgmt-Product Rangers"`
+- **Agents Of Item**: `"F-ITEM-Mgmt-Agents Of Item"` (team ID: `1ccb03cb-29e3-45a0-bac2-218622c32779`)
+
+Deduplicate: merge both result sets by issue key. The combined unique set is your working list.
+
+> **Team field note**: `customfield_10001` is NOT JQL-filterable — filter it client-side after fetching results. The field value is an object with `name` and `id` properties.
 
 > `searchResultMode` controls what the search returns: `"issues"` = issue data, `"count"` = count only, `"all"` = both. We always use `"issues"`.
 
-Present the full list to the user with: #, Issue Key, Type, Summary, Fix Version, Story Points.
+Present the full combined list to the user with: #, Issue Key, Type, Summary, Fix Version, Story Points.
 
 ---
 
