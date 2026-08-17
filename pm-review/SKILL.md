@@ -31,13 +31,13 @@ Then proceed with the correct values below.
 ## Step 1 — Find PM Review items
 
 Use the `searchJiraIssuesUsingJql` tool with:
-- `jql`: `project = EISART AND status = "PM Review" AND sprint in openSprints() AND "Team[Team]" = "<team name>"`
-  - Product Rangers: `"Team[Team]" = "F-ITEM-Mgmt-Product Rangers"`
-  - Agents Of Item: `"Team[Team]" = "F-ITEM-Mgmt-Agents Of Item"`
+- `jql`: `project = EISART AND status = "PM Review" AND sprint in openSprints() AND fixVersion in (<ToBeReleased ID>, <NonDeployable ID>)`
+  - Product Rangers: `fixVersion in (70628, 71012)`
+  - Agents Of Item: `fixVersion in (69805, 69806)`
 - `fields`: `["summary", "description", "issuetype", "status", "fixVersions", "customfield_10032", "comment", "attachment", "parent"]`
 - `searchResultMode`: `"issues"` ← **required by the updated Jira API; always include this**
 
-> **Why Team[Team] and not assignee group?** The `assignee in membersOf()` filter misses contributors who aren't in the Jira group but are working on the team's sprint. The `"Team[Team]"` field (customfield_10001) is set directly on each ticket and is the authoritative signal for team ownership.
+> **Why fix version and not assignee group or Team field?** `assignee in membersOf()` misses contributors not in the Jira group. The `"Team[Team]"` custom field (customfield_10001) is not JQL-filterable in this Jira instance. Fix version IDs are the most reliable signal — Product Rangers and Agents Of Item items are explicitly tagged with their team's fix versions.
 
 > `searchResultMode` controls what the search returns: `"issues"` = issue data, `"count"` = count only, `"all"` = both. We always use `"issues"`.
 
